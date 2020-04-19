@@ -29,6 +29,10 @@ provider:
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'us-east-1'}
 
+  environment:
+    TODOS_TABLE: Todos-${self:provider.stage}
+    TODOS_ID_INDEX: TodosIndexId
+
 functions:
 
   Auth:
@@ -76,5 +80,6 @@ functions:
           path: todos/{todoId}/attachment
 
 resources:
-  Resources:
-    # TODO: Add any necessary AWS resources
+  - ${file(./resources/todosTable.yml)}
+    
+    
