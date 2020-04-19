@@ -3,7 +3,7 @@ import { TodoItem } from '../models/TodoItem'
 import { CreateTodoRequest } from '../requests/CreateTodoRequest'
 import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
 
-import { getItems, putItem, updateItem } from '../dataLayer/todosDataLayer'
+import { getItems, putItem, updateItem, deleteItem } from '../dataLayer/todosDataLayer'
 
 export async function getAllTodos(userId: string): Promise<TodoItem[]> {
   return getItems(userId)
@@ -29,4 +29,8 @@ export async function updateTodo(updateTodoRequest: UpdateTodoRequest, todoId: s
     userId,
     ...updateTodoRequest
   })
+}
+
+export async function deleteTodo(todoId: string, userId: string): Promise<void> {
+  return await deleteItem(todoId, userId)
 }

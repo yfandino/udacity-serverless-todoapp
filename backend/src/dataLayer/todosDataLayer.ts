@@ -43,7 +43,7 @@ export async function updateItem(todo: any): Promise<TodoItem> {
       "userId": todo.userId,
       "todoId": todo.todoId
     },
-    UpdateExpression: "set #name = :name, dueDate = :dueDate, done = :done",,
+    UpdateExpression: "set #name = :name, dueDate = :dueDate, done = :done",
     ExpressionAttributeNames: {
       "#name": "name"
     },
@@ -58,6 +58,17 @@ export async function updateItem(todo: any): Promise<TodoItem> {
   return updatedTodo.Attributes as TodoItem
 }
 
+export async function deleteItem(todoId: string, userId: string): Promise<void> {
+  const DocumentClient = createDynamoDBClient()
+  
+  await DocumentClient.delete({
+    TableName: TODOS_TABLE,
+    Key: {
+      userId,
+      todoId
+    }
+  }).promise()
+}
 
 function createDynamoDBClient() {
   if (process.env.IS_OFFLINE) {
