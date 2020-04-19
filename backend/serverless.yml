@@ -18,13 +18,12 @@ custom:
     stages:
       - local
 
-
 package:
   individually: true
 
 provider:
   name: aws
-  runtime: nodejs8.10
+  runtime: nodejs12.x
 
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'us-east-1'}
@@ -32,6 +31,7 @@ provider:
   environment:
     TODOS_TABLE: Todos-${self:provider.stage}
     TODOS_ID_INDEX: TodosIndexId
+    ATTACHMENTS_BUCKET: p5-attachment-todo-bucket-as5d-${self:provider.stage}
 
 functions:
 
@@ -44,7 +44,16 @@ functions:
       - http:
           method: get
           path: todos
+          cors: true
           authorizer: Auth
+    iamRoleStatementsName: api-lambda-GetTodos
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - dynamodb:Query
+        Resource: 
+          - !GetAtt TodosDynamoDbTable.Arn
+          - !Join [ /, [ !GetAtt TodosDynamoDbTable.Arn, "index/${self:provider.environment.TODOS_ID_INDEX}" ] ]
 
   CreateTodo:
     handler: src/lambda/http/createTodo.handler
@@ -52,7 +61,14 @@ functions:
       - http:
           method: post
           path: todos
+          cors: true
           authorizer: Auth
+    iamRoleStatementsName: api-lambda-CreateTodo
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - dynamodb:PutItem
+        Resource: !GetAtt TodosDynamoDbTable.Arn
 
   UpdateTodo:
     handler: src/lambda/http/updateTodo.handler
@@ -60,7 +76,14 @@ functions:
       - http:
           method: patch
           path: todos/{todoId}
+          cors: true
           authorizer: Auth
+    iamRoleStatementsName: api-lambda-UpdateTodo
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - dynamodb:UpdateItem
+        Resource: !GetAtt TodosDynamoDbTable.Arn
 
   DeleteTodo:
     handler: src/lambda/http/deleteTodo.handler
@@ -68,17 +91,36 @@ functions:
       - http:
           method: delete
           path: todos/{todoId}
+          cors: true
           authorizer: Auth
+    iamRoleStatementsName: api-lambda-DeleteTodo
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - dynamodb:DeleteItem
+        Resource: !GetAtt TodosDynamoDbTable.Arn
 
-  # TODO: Configure this function
   GenerateUploadUrl:
     handler: src/lambda/http/generateUploadUrl.handler
     events:
       - http:
           method: post
           path: todos/{todoId}/attachment
+          cors: true
+          authorizer: Auth
+    iamRoleStatementsName: api-lambda-GenerateUploadUrl
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - s3:PutObject
+        Resource: !Join [ '/', [ !GetAtt AttachmentsS3Bucket.Arn, '*' ] ]
+      - Effect: "Allow"
+        Action:
+          - dynamodb:UpdateItem
+        Resource: !GetAtt TodosDynamoDbTable.Arn
 
 resources:
   - ${file(./resources/todosTable.yml)}
+  - ${file(./resources/attachmentsS3Bucket.yml)}
     
     
