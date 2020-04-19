@@ -2,12 +2,15 @@ import * as AWS from 'aws-sdk'
 
 import { TodoItem } from '../models/TodoItem'
 
+import { createLogger } from '../utils/logger'
+const logger = createLogger('todo-data-layer')
+
 const TODOS_TABLE = process.env.TODOS_TABLE
 const TODOS_ID_INDEX = process.env.TODOS_ID_INDEX
 const ATTACHMENTS_BUCKET = process.env.ATTACHMENTS_BUCKET
 
 export async function getItems(userId: string): Promise<TodoItem[]> {
-  console.log(`Getting all todos for user: ${userId}`)
+  logger.info(`Getting all todos for user: ${userId}`)
 
   const DocumentClient = createDynamoDBClient()
 
@@ -25,6 +28,7 @@ export async function getItems(userId: string): Promise<TodoItem[]> {
 }
 
 export async function putItem(todo: TodoItem): Promise<TodoItem> {
+  logger.info(`Creating todo : ${todo}`)
   const DocumentClient = createDynamoDBClient()
 
   await DocumentClient.put({
@@ -36,6 +40,7 @@ export async function putItem(todo: TodoItem): Promise<TodoItem> {
 }
 
 export async function updateItem(todo: any): Promise<TodoItem> {
+  logger.info(`Updating todo : ${todo}`)
   const DocumentClient = createDynamoDBClient()
   
   const updatedTodo = await DocumentClient.update({
@@ -60,6 +65,7 @@ export async function updateItem(todo: any): Promise<TodoItem> {
 }
 
 export async function addAttachment(userId: string, todoId: string): Promise<TodoItem> {
+  logger.info(`Add attachment to todoId : ${todoId}`)
   const DocumentClient = createDynamoDBClient()
   
   const updatedTodo = await DocumentClient.update({
@@ -79,6 +85,7 @@ export async function addAttachment(userId: string, todoId: string): Promise<Tod
 }
 
 export async function deleteItem(todoId: string, userId: string): Promise<void> {
+  logger.info(`Delete todo : ${todoId}`)
   const DocumentClient = createDynamoDBClient()
   
   await DocumentClient.delete({
