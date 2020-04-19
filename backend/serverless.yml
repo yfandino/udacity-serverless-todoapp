@@ -37,6 +37,9 @@ functions:
 
   Auth:
     handler: src/lambda/auth/auth0Authorizer.handler
+    environment:
+      AUTH0_JWTK_URL: AUTO0_JWKS_URL
+
 
   GetTodos:
     handler: src/lambda/http/getTodos.handler
