@@ -9,7 +9,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
   const jwt = event.headers.Authorization.split(' ').pop()
   
   const userId = parseUserId(jwt)
-  const todos = await getAllTodos(userId)
+  const items = await getAllTodos(userId)
 
   return {
     statusCode: 200,
@@ -17,6 +17,6 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
         "Access-Control-Request-Method": "GET",
         "Access-Control-Request-Origin": "*"
     },
-    body: JSON.stringify(todos)
+    body: JSON.stringify({ items })
   }
 }

@@ -55,7 +55,7 @@ async function verifyToken(authHeader: string): Promise<JwtPayload> {
   const jwt: Jwt = decode(token, { complete: true }) as Jwt
   const jwks = await Axios.get(jwksUrl).then( res => res.data )
   const key = jwks.keys.find( key => key.kid === jwt.header.kid)
-
+  
   if (!key) throw new Error('Unauthrized')
   
   const cert = getCert(key.x5c[0])

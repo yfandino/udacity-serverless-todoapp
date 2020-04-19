@@ -13,14 +13,14 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
   const jwt = event.headers.Authorization.split(' ').pop()
   const userId = parseUserId(jwt)
 
-  const todo = await updateTodo(updatedTodo, todoId, userId);
+  await updateTodo(updatedTodo, todoId, userId);
 
   return {
-    statusCode: 200,
+    statusCode: 204,
     headers: {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Credentials': true
     },
-    body: JSON.stringify({ ...todo })
+    body: ""
   }
 }
