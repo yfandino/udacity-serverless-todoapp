@@ -4,6 +4,7 @@ import { TodoItem } from '../models/TodoItem'
 
 const TODOS_TABLE = process.env.TODOS_TABLE
 const TODOS_ID_INDEX = process.env.TODOS_ID_INDEX
+const ATTACHMENTS_BUCKET = process.env.ATTACHMENTS_BUCKET
 
 export async function getItems(userId: string): Promise<TodoItem[]> {
   console.log(`Getting all todos for user: ${userId}`)
@@ -51,6 +52,25 @@ export async function updateItem(todo: any): Promise<TodoItem> {
       ":name" : todo.name,
       ":dueDate" : todo.dueDate,
       ":done" : todo.done,
+    },
+    ReturnValues: "ALL_NEW"
+  }).promise()
+  
+  return updatedTodo.Attributes as TodoItem
+}
+
+export async function addAttachment(userId: string, todoId: string): Promise<TodoItem> {
+  const DocumentClient = createDynamoDBClient()
+  
+  const updatedTodo = await DocumentClient.update({
+    TableName: TODOS_TABLE,
+    Key: {
+      "userId": userId,
+      "todoId": todoId
+    },
+    UpdateExpression: "set attachmentUrl = :attachmentUrl",
+    ExpressionAttributeValues: {
+      ":attachmentUrl" : `https://${ATTACHMENTS_BUCKET}.s3.amazonaws.com/${userId}/${todoId}`
     },
     ReturnValues: "ALL_NEW"
   }).promise()

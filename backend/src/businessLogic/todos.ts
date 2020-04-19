@@ -3,7 +3,8 @@ import { TodoItem } from '../models/TodoItem'
 import { CreateTodoRequest } from '../requests/CreateTodoRequest'
 import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
 
-import { getItems, putItem, updateItem, deleteItem } from '../dataLayer/todosDataLayer'
+import { getItems, putItem, updateItem, addAttachment, deleteItem } from '../dataLayer/todosDataLayer'
+import { getUploadPresignedURL } from '../dataLayer/todosS3Layer'
 
 export async function getAllTodos(userId: string): Promise<TodoItem[]> {
   return getItems(userId)
@@ -33,4 +34,10 @@ export async function updateTodo(updateTodoRequest: UpdateTodoRequest, todoId: s
 
 export async function deleteTodo(todoId: string, userId: string): Promise<void> {
   return await deleteItem(todoId, userId)
+}
+
+export async function getPresignedURL(userId: string, todoId: string): Promise<string> {
+  const attachmentUrl = await getUploadPresignedURL(userId, todoId)
+  await addAttachment(userId, todoId) 
+  return attachmentUrl;
 }

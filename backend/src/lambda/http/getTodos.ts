@@ -14,8 +14,9 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
   return {
     statusCode: 200,
     headers: {
-        "Access-Control-Request-Method": "GET",
-        "Access-Control-Request-Origin": "*"
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Request-Method": "GET",
+      'Access-Control-Allow-Credentials': true
     },
     body: JSON.stringify({ items })
   }
