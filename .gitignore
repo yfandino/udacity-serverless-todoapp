@@ -36,3 +36,4 @@ yarn-error.log*
 images/
 *postman_collection.json
 .prettierrc.json
+.vscode/

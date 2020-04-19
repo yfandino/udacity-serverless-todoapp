@@ -7,8 +7,6 @@ const TODOS_ID_INDEX = process.env.TODOS_ID_INDEX
 
 export async function getItems(userId: string): Promise<TodoItem[]> {
   console.log(`Getting all todos for user: ${userId}`)
-  console.log(TODOS_TABLE)
-  console.log(TODOS_ID_INDEX)
 
   const DocumentClient = createDynamoDBClient()
 
@@ -18,7 +16,8 @@ export async function getItems(userId: string): Promise<TodoItem[]> {
     KeyConditionExpression: 'userId = :userId',
     ExpressionAttributeValues: {
       ':userId': userId
-    }
+    },
+    ScanIndexForward: false
   }).promise()
   
   return result.Items as TodoItem[]
@@ -33,6 +32,30 @@ export async function putItem(todo: TodoItem): Promise<TodoItem> {
   }).promise()
 
   return todo
+}
+
+export async function updateItem(todo: any): Promise<TodoItem> {
+  const DocumentClient = createDynamoDBClient()
+  
+  const updatedTodo = await DocumentClient.update({
+    TableName: TODOS_TABLE,
+    Key: {
+      "userId": todo.userId,
+      "todoId": todo.todoId
+    },
+    UpdateExpression: "set #name = :name, dueDate = :dueDate, done = :done",,
+    ExpressionAttributeNames: {
+      "#name": "name"
+    },
+    ExpressionAttributeValues: {
+      ":name" : todo.name,
+      ":dueDate" : todo.dueDate,
+      ":done" : todo.done,
+    },
+    ReturnValues: "ALL_NEW"
+  }).promise()
+  
+  return updatedTodo.Attributes as TodoItem
 }
 
 
