@@ -1,8 +1,11 @@
 import * as AWS from 'aws-sdk'
 
 import { TodoItem } from '../models/TodoItem'
-
 import { createLogger } from '../utils/logger'
+
+const AWSXRay =require('aws-xray-sdk');
+const XAWS = AWSXRay.captureAWS(AWS)
+
 const logger = createLogger('todo-data-layer')
 
 const TODOS_TABLE = process.env.TODOS_TABLE
@@ -106,5 +109,5 @@ function createDynamoDBClient() {
     })
   }
 
-  return new AWS.DynamoDB.DocumentClient()
+  return new XAWS.DynamoDB.DocumentClient()
 }

@@ -1,11 +1,13 @@
 import * as AWS from 'aws-sdk'
+import { captureAWS } from 'aws-xray-sdk'
 import { createLogger } from '../utils/logger'
 
+const XAWS = captureAWS(AWS)
 const logger = createLogger('todo-s3-layer')
 
 const ATTACHMENTS_BUCKET = process.env.ATTACHMENTS_BUCKET
 
-const S3 = new AWS.S3({
+const S3 = new XAWS.S3({
   signatureVersion: 'v4'
 })
 
